@@ -12,7 +12,7 @@ def drawboard():
         board.append(v)
         board.append(h)
     for k in range(len(board)):
-        board[k].draw(win)
+        board[k].draw(State.win)
 
     buttons = []
     txt = []
@@ -22,28 +22,27 @@ def drawboard():
         buttons[i].setFill('green')
         txt.append(Text(buttons[i].getCenter(),i+1))
 
-        buttons[i].draw(win)
-        txt[i].draw(win)
+        buttons[i].draw(State.win)
+        txt[i].draw(State.win)
 
 def user_input():
     while True:
         try:
-            click = win.getMouse()
+            click = State.win.getMouse()
             if click.getY() >= 610 and click.getY() <= 665:
                 row = (int(click.getX() / 75))
                 valid = False
-                for i in range(len(discs[row])):
-                    if discs[row][i] == 0: 
-                        discs[row][i] = 1
+                for i in range(len(State.discs[row])):
+                    if State.discs[row][i] == 0: 
+                        State.discs[row][i] = 1
                         valid = True
                         drawdisc(row, i, 1)
                         break
                 if valid:
                     break
         except:
-            win.close()
-            global playing
-            playing = False
+            State.win.close()
+            State.playing = False
             return
 
 def computer_input():
@@ -52,9 +51,9 @@ def computer_input():
         seed()
         row = randint(0,7)
         valid = False
-        for i in range(len(discs[row])):
-            if discs[row][i] == 0: 
-                discs[row][i] = 2
+        for i in range(len(State.discs[row])):
+            if State.discs[row][i] == 0: 
+                State.discs[row][i] = 2
                 valid = True
                 drawdisc(row, i, 2)
                 break
@@ -63,24 +62,24 @@ def computer_input():
 
 def check_user():           # Checking User's win
     won = False
-    for i in range(len(discs)-3):
-        for j in range(len(discs[i])):
-            if discs[i][j] == discs[i+1][j] == discs[i+2][j] == discs[i+3][j] == 1:
+    for i in range(len(State.discs)-3):
+        for j in range(len(State.discs[i])):
+            if State.discs[i][j] == State.discs[i+1][j] == State.discs[i+2][j] == State.discs[i+3][j] == 1:
                 won = True
                 wd = ((i,j), (i+3,j))
                 break
-        for j in range(len(discs[i])-3):
-            if discs[i][j] == discs[i+1][j+1] == discs[i+2][j+2] == discs[i+3][j+3] == 1:
+        for j in range(len(State.discs[i])-3):
+            if State.discs[i][j] == State.discs[i+1][j+1] == State.discs[i+2][j+2] == State.discs[i+3][j+3] == 1:
                 won = True
                 wd = ((i,j), (i+3,j+3))
                 break
-            elif discs[i][j+3] == discs[i+1][j+2] == discs[i+2][j+1] == discs[i+3][j] == 1:
+            elif State.discs[i][j+3] == State.discs[i+1][j+2] == State.discs[i+2][j+1] == State.discs[i+3][j] == 1:
                 won = True
                 wd = ((i,j+3), (i+3,j))
                 break
-    for i in range(len(discs)):
-        for j in range(len(discs[i])-3):
-            if discs[i][j] == discs[i][j+1] == discs[i][j+2] == discs[i][j+3] == 1:
+    for i in range(len(State.discs)):
+        for j in range(len(State.discs[i])-3):
+            if State.discs[i][j] == State.discs[i][j+1] == State.discs[i][j+2] == State.discs[i][j+3] == 1:
                 won = True
                 wd = ((i,j), (i,j+3))
                 break
@@ -88,9 +87,10 @@ def check_user():           # Checking User's win
     if won:
         line = Line(Point(37.5 + wd[0][0] * 75, 600 - (37.5 + wd[0][1] * 75)), Point(37.5 + wd[1][0] * 75, 600 - (37.5 + wd[1][1] * 75)))
         line.setWidth(5)
-        line.draw(win)
+        line.draw(State.win)
         
         alert = GraphWin("You Win!",300,100)
+        alert.setBackground('white')
         txt = Text(Point(150,30),"You win!")
         retry = Text(Point(150,65), "Retry?(y/n)")
         txt.draw(alert)
@@ -99,37 +99,36 @@ def check_user():           # Checking User's win
             key_input = alert.getKey()
             if key_input == 'y' or key_input == 'Y':
                 alert.close()
-                win.close()
+                State.win.close()
                 main()
                 break
             elif key_input == 'n' or key_input == 'N':
-                global playing
-                playing = False
+                State.playing = False
                 alert.close()
-                win.close()
+                State.win.close()
                 break
         
             
 def check_comp():           #Checking Computer's win
     won = False
-    for i in range(len(discs)-3):
-        for j in range(len(discs[i])):
-            if discs[i][j] == discs[i+1][j] == discs[i+2][j] == discs[i+3][j] == 2:
+    for i in range(len(State.discs)-3):
+        for j in range(len(State.discs[i])):
+            if State.discs[i][j] == State.discs[i+1][j] == State.discs[i+2][j] == State.discs[i+3][j] == 2:
                 won = True
                 wd = ((i,j), (i+3,j))
                 break
-        for j in range(len(discs[i])-3):
-            if discs[i][j] == discs[i+1][j+1] == discs[i+2][j+2] == discs[i+3][j+3] == 2:
+        for j in range(len(State.discs[i])-3):
+            if State.discs[i][j] == State.discs[i+1][j+1] == State.discs[i+2][j+2] == State.discs[i+3][j+3] == 2:
                 won = True
                 wd = ((i,j), (i+3,j+3))
                 break
-            elif discs[i][j+3] == discs[i+1][j+2] == discs[i+2][j+1] == discs[i+3][j] == 2:
+            elif State.discs[i][j+3] == State.discs[i+1][j+2] == State.discs[i+2][j+1] == State.discs[i+3][j] == 2:
                 won = True
                 wd = ((i,j+3), (i+3,j))
                 break
-    for i in range(len(discs)):
-        for j in range(len(discs[i])-3):
-            if discs[i][j] == discs[i][j+1] == discs[i][j+2] == discs[i][j+3] == 2:
+    for i in range(len(State.discs)):
+        for j in range(len(State.discs[i])-3):
+            if State.discs[i][j] == State.discs[i][j+1] == State.discs[i][j+2] == State.discs[i][j+3] == 2:
                 won = True
                 wd = ((i,j), (i,j+3))
                 break
@@ -137,9 +136,10 @@ def check_comp():           #Checking Computer's win
     if won:
         line = Line(Point(37.5 + wd[0][0] * 75, 600 - (37.5 + wd[0][1] * 75)), Point(37.5 + wd[1][0] * 75, 600 - (37.5 + wd[1][1] * 75)))
         line.setWidth(5)
-        line.draw(win)
+        line.draw(State.win)
         
         alert = GraphWin("You Lose!",300,100)
+        alert.setBackground('white')
         txt = Text(Point(150,30),"You Lose!")
         retry = Text(Point(150,65), "Retry?(y/n)")
         txt.draw(alert)
@@ -148,23 +148,23 @@ def check_comp():           #Checking Computer's win
             key_input = alert.getKey()
             if key_input == 'y' or key_input == 'Y':
                 alert.close()
-                win.close()
+                State.win.close()
                 main()
             elif key_input == 'n' or key_input == 'N':
-                global playing
-                playing = False
+                State.playing = False
                 alert.close()
-                win.close()
+                State.win.close()
             break
     
     complete = True
-    for i in range(len(discs)):
-        for j in range(len(discs[i])):
-            if discs[i][j] == 0:
+    for i in range(len(State.discs)):
+        for j in range(len(State.discs[i])):
+            if State.discs[i][j] == 0:
                 complete = False
 
     if complete:
         alert = GraphWin("Draw!",300,100)
+        alert.setBackground('white')
         txt = Text(Point(150,30),"It's a draw!")
         retry = Text(Point(130,65), "Retry?(y/n)")
         txt.draw(alert)
@@ -173,13 +173,12 @@ def check_comp():           #Checking Computer's win
             key_input = alert.getKey()
             if key_input == 'y' or key_input == 'Y':
                 alert.close()
-                win.close()
+                State.win.close()
                 main()
             elif key_input == 'n' or key_input == 'N':
-                global playing
-                playing = False
+                State.playing = False
                 alert.close()
-                win.close()
+                State.win.close()
             break
 
 def drawdisc(row, i, colour):
@@ -189,13 +188,10 @@ def drawdisc(row, i, colour):
         c.setFill('red')
     else:
         c.setFill('yellow')
-    c.draw(win)
+    c.draw(State.win)
 
 def main():
-    global win
-    global discs
-    
-    discs = [
+    State.discs = [
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
@@ -206,23 +202,27 @@ def main():
     [0,0,0,0,0,0,0,0]
     ]
 
-    win = GraphWin("Connect four!", 601, 676)
-    win.setBackground(color_rgb(45, 107, 206))
+    State.win = GraphWin("Connect four!", 601, 676)
+    State.win.setBackground(color_rgb(45, 107, 206))
     drawboard()
 
 #main
-playing = True
-discs = None
-win = None
+class State:
+    playing = True
+    discs = None
+    win = None
 
 def run():
     main()
 
     user_input()
-    while playing:
+    while State.playing:
         computer_input()
         check_comp()
         user_input()
         check_user()
 
-    print 'Thank you for playing Connect Four!'
+    print('Thank you for playing Connect Four!')
+
+if __name__ == '__main__':
+    run()

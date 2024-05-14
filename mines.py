@@ -16,17 +16,18 @@ class Cell():
         if self.flagged:
             self.flagged = False
         if not self.revealed:
-            rect = Rectangle(Point(self.col * size, self.row * size),
-                             Point((self.col+1) * size, (self.row+1) * size))
+            rect = Rectangle(Point(self.col * State.size, self.row * State.size),
+                             Point((self.col+1) * State.size, (self.row+1) * State.size))
             rect.setFill(color_rgb(170, 170, 170))
             rect.setWidth(2)
-            rect.draw(win)
+            rect.draw(State.win)
             self.revealed = True
         if self.bee:
             self.revealed = True
             showall(False)
 
             alert = GraphWin("You Hit a mine!", 300, 100)
+            alert.setBackground('white')
             txt = Text(Point(150, 30), "You lose.")
             retry = Text(Point(150, 65), "Retry?(y/n)")
             txt.draw(alert)
@@ -35,20 +36,18 @@ class Cell():
                 try:
                     key_input = alert.getKey()
                 except:
-                    win.close()
-                    global playing
-                    playing = False
+                    State.win.close()
+                    State.playing = False
                     return
                 if key_input == 'y' or key_input == 'Y':
                     alert.close()
-                    win.close()
+                    State.win.close()
                     main()
                     break
                 elif key_input == 'n' or key_input == 'N':
-                    global playing
-                    playing = False
+                    State.playing = False
                     alert.close()
-                    win.close()
+                    State.win.close()
                     break
         else:
             neighbours = self.countNeighbours()
@@ -56,44 +55,45 @@ class Cell():
                 if not self.flooding:
                     floodfill(self)
             else:
-                self.t = Text(Point(size * 0.5 + self.col * size,
-                                    size * 0.5 + self.row * size), neighbours)
-                textsize = int(size * 0.5) - (int(size * 0.5) % 4)
+                self.t = Text(Point(State.size * 0.5 + self.col * State.size,
+                                    State.size * 0.5 + self.row * State.size), neighbours)
+                textsize = int(State.size * 0.5) - (int(State.size * 0.5) % 4)
                 if textsize <= 36:
                     self.t.setSize(textsize)
                 else:
                     self.t.setSize(36)
-                self.t.draw(win)
+                self.t.draw(State.win)
 
     def flag(self):
         if not self.revealed:
             if not self.flagged:
                 self.flagged = True
-                self.t = Text(Point(size * 0.5 + self.col * size,
-                                    size * 0.5 + self.row * size), 'F')
-                textsize = int(size * 0.5) - (int(size * 0.5) % 4)
+                self.t = Text(Point(State.size * 0.5 + self.col * State.size,
+                                    State.size * 0.5 + self.row * State.size), 'F')
+                textsize = int(State.size * 0.5) - (int(State.size * 0.5) % 4)
                 if textsize <= 36:
                     self.t.setSize(textsize)
                 else:
                     self.t.setSize(36)
                 self.t.setFill('red')
-                self.t.draw(win)
+                self.t.draw(State.win)
             else:
                 self.t.undraw()
                 self.flagged = False
 
         flag_count = 0
         invalid = False
-        for i in grid:
+        for i in State.grid:
             for j in i:
                 if j.flagged and not j.bee:
                     invalid = True
                 if j.flagged and j.bee:
                     flag_count += 1
 
-        if flag_count == mine_num and not invalid:
+        if flag_count == State.mine_num and not invalid:
             showall(True)
             alert = GraphWin("You WIN!!!", 300, 100)
+            alert.setBackground('white')
             txt = Text(Point(150, 30), "You won the game!")
             retry = Text(Point(150, 65), "Replay?(y/n)")
             txt.draw(alert)
@@ -102,20 +102,18 @@ class Cell():
                 try:
                     key_input = alert.getKey()
                 except:
-                    win.close()
-                    global playing
-                    playing = False
+                    State.win.close()
+                    State.playing = False
                     return
                 if key_input == 'y' or key_input == 'Y':
                     alert.close()
-                    win.close()
+                    State.win.close()
                     main()
                     break
                 elif key_input == 'n' or key_input == 'N':
-                    global playing
-                    playing = False
+                    State.playing = False
                     alert.close()
-                    win.close()
+                    State.win.close()
                     break
 
     def countNeighbours(self):
@@ -124,8 +122,8 @@ class Cell():
         n = 0
         for i in [r-1, r, r+1]:
             for j in [c-1, c, c+1]:
-                if (not (i == r and j == c)) and i >= 0 and i <= gridsize - 1 and j >= 0 and j <= gridsize - 1:
-                    if grid[i][j].bee:
+                if (not (i == r and j == c)) and i >= 0 and i <= State.gridsize - 1 and j >= 0 and j <= State.gridsize - 1:
+                    if State.grid[i][j].bee:
                         n += 1
         return n
 
@@ -138,111 +136,107 @@ def floodfill(self):
     for i in [r-1, r, r+1]:
         for j in [c-1, c, c+1]:
             if (i >= 0 and
-                i <= gridsize - 1 and
+                i <= State.gridsize - 1 and
                 j >= 0 and
-                j <= gridsize - 1 and
-                grid[i][j].revealed == False and
-                grid[i][j].bee == False):
-                grid[i][j].show()
-                if grid[i][j].countNeighbours() == 0:
-                    floodfill(grid[i][j])
+                j <= State.gridsize - 1 and
+                State.grid[i][j].revealed == False and
+                State.grid[i][j].bee == False):
+                State.grid[i][j].show()
+                if State.grid[i][j].countNeighbours() == 0:
+                    floodfill(State.grid[i][j])
 
 
 def showall(won):
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
-            cell = grid[i][j]
+    for i in range(len(State.grid)):
+        for j in range(len(State.grid[i])):
+            cell = State.grid[i][j]
             if not cell.revealed:
-                rect = Rectangle(Point(cell.col * size, cell.row * size),
-                                 Point((cell.col+1) * size, (cell.row+1) * size))
+                rect = Rectangle(Point(cell.col * State.size, cell.row * State.size),
+                                 Point((cell.col+1) * State.size, (cell.row+1) * State.size))
                 rect.setFill(color_rgb(170, 170, 170))
                 rect.setWidth(2)
-                rect.draw(win)
+                rect.draw(State.win)
                 cell.revealed = True
             if cell.bee:
                 cell.revealed = True
-                rect = Rectangle(Point(cell.col * size, cell.row * size),
-                                 Point((cell.col+1) * size, (cell.row+1) * size))
+                rect = Rectangle(Point(cell.col * State.size, cell.row * State.size),
+                                 Point((cell.col+1) * State.size, (cell.row+1) * State.size))
                 if won == True:
                     rect.setFill('green')
                 else:
                     rect.setFill('red')
                 rect.setWidth(2)
-                rect.draw(win)
-                b = Circle(Point(size * 0.5 + cell.col * size,
-                                 size * 0.5 + cell.row * size), size * 0.25)
+                rect.draw(State.win)
+                b = Circle(Point(State.size * 0.5 + cell.col * State.size,
+                                 State.size * 0.5 + cell.row * State.size), State.size * 0.25)
                 b.setFill('black')
-                b.draw(win)
+                b.draw(State.win)
                 for k in [-1, 0, 1]:
                     for l in [-1, 0, 1]:
                         if k == 0 or l == 0:
-                            spoke = Line(Point(size * 0.5 + cell.col * size, size * 0.5 + cell.row * size), Point(
-                                (size * 0.5 + size * 0.33 * k) + cell.col * size, (size * 0.5 + size * 0.33 * l) + cell.row * size))
+                            spoke = Line(Point(State.size * 0.5 + cell.col * State.size, State.size * 0.5 + cell.row * State.size), Point(
+                                (State.size * 0.5 + State.size * 0.33 * k) + cell.col * State.size, (State.size * 0.5 + State.size * 0.33 * l) + cell.row * State.size))
                         else:
-                            spoke = Line(Point(size * 0.5 + cell.col * size, size * 0.5 + cell.row * size), Point(
-                                (size * 0.5 + size * 0.25 * k) + cell.col * size, (size * 0.5 + size * 0.25 * l) + cell.row * size))
+                            spoke = Line(Point(State.size * 0.5 + cell.col * State.size, State.size * 0.5 + cell.row * State.size), Point(
+                                (State.size * 0.5 + State.size * 0.25 * k) + cell.col * State.size, (State.size * 0.5 + State.size * 0.25 * l) + cell.row * State.size))
                         spoke.setWidth(5)
-                        spoke.draw(win)
+                        spoke.draw(State.win)
 
             else:
                 neighbours = cell.countNeighbours()
                 if neighbours == 0:
                     pass
                 else:
-                    t = Text(Point(size * 0.5 + cell.col * size,
-                                   size * 0.5 + cell.row * size), neighbours)
-                    textsize = int(size * 0.5) - (int(size * 0.5) % 4)
+                    t = Text(Point(State.size * 0.5 + cell.col * State.size,
+                                   State.size * 0.5 + cell.row * State.size), neighbours)
+                    textsize = int(State.size * 0.5) - (int(State.size * 0.5) % 4)
                     if textsize <= 36:
                         t.setSize(textsize)
                     else:
                         t.setSize(36)
-                    t.draw(win)
+                    t.draw(State.win)
 
 
 def drawboard():
     board = []
-    for i in range(gridsize + 1):
-        h = Line(Point(0 + size * i, 0), Point(0 + size * i, windowsize))
+    for i in range(State.gridsize + 1):
+        h = Line(Point(0 + State.size * i, 0), Point(0 + State.size * i, State.windowsize))
         h.setWidth(2)
-        v = Line(Point(0, 0 + size * i), Point(windowsize, 0 + size * i))
+        v = Line(Point(0, 0 + State.size * i), Point(State.windowsize, 0 + State.size * i))
         v.setWidth(2)
         board.append(v)
         board.append(h)
     for k in range(len(board)):
-        board[k].draw(win)
+        board[k].draw(State.win)
 
 
 def get_input():
     try:
-        click = win.getMouse()
+        click = State.win.getMouse()
     except:
-        global playing
-        playing = False
+        State.playing = False
         return
-    row = int(click.getY() / size)
-    col = int(click.getX() / size)
-    if row > gridsize - 1:
-        row = gridsize - 1
-    if col > gridsize - 1:
-        col = gridsize - 1
+    row = int(click.getY() / State.size)
+    col = int(click.getX() / State.size)
+    if row > State.gridsize - 1:
+        row = State.gridsize - 1
+    if col > State.gridsize - 1:
+        col = State.gridsize - 1
 
     start = time()
     while time() - start < 0.12:
-        click = win.checkMouse()
+        click = State.win.checkMouse()
         if click:
-            if int(click.getY() / size) == row and int(click.getX() / size) == col:
-                grid[row][col].flag()
+            if int(click.getY() / State.size) == row and int(click.getX() / State.size) == col:
+                State.grid[row][col].flag()
                 break
     else:
-        grid[row][col].show()
+        State.grid[row][col].show()
 
 
 def difficulty():
-    global gridsize
-    global windowsize
-    global mine_num
-
     mode = GraphWin("Choose Difficulty", 450, 450)
+    mode.setBackground('white')
     heading = Text(Point(225, 22), "Choose game mode: ")
     heading.setSize(25)
     heading.draw(mode)
@@ -290,8 +284,7 @@ def difficulty():
         try:
             click = mode.getMouse()
         except:
-            global playing
-            playing = False
+            State.playing = False
             return(0, 0)
 
         if (40 < click.getX() < 210 and 50 < click.getY() < 220):
@@ -309,56 +302,52 @@ def difficulty():
 
 
 def main():
-    global grid
-    global playing
-    global win
+    State.grid = []
+    State.playing = True
 
-    grid = []
-    playing = True
-
-    global gridsize
-    global windowsize
-    global mine_num
-    global size
-
-    gridsize, mine_num = difficulty()
+    State.gridsize, State.mine_num = difficulty()
     try:
-        size = windowsize / gridsize
+        State.size = State.windowsize / State.gridsize
     except:
         return
 
-    for rows in range(gridsize):
-        grid.append([])
-        for cols in range(gridsize):
-            grid[rows].append(Cell(rows, cols))
+    for rows in range(State.gridsize):
+        State.grid.append([])
+        for cols in range(State.gridsize):
+            State.grid[rows].append(Cell(rows, cols))
 
     seed()
     mines = 0
-    while mines < mine_num:
-        cell_row = randint(0, gridsize - 1)
-        cell_col = randint(0, gridsize - 1)
-        if not grid[cell_row][cell_col].bee:
-            grid[cell_row][cell_col].bee = True
+    while mines < State.mine_num:
+        cell_row = randint(0, State.gridsize - 1)
+        cell_col = randint(0, State.gridsize - 1)
+        if not State.grid[cell_row][cell_col].bee:
+            State.grid[cell_row][cell_col].bee = True
             mines += 1
 
-    win = GraphWin("Minesweeper", windowsize + 1, windowsize + 1)
+    State.win = GraphWin("Minesweeper", State.windowsize + 1, State.windowsize + 1)
+    State.win.setBackground('white')
 
     drawboard()
 
 # main
-gridsize = 8
-windowsize = 600
-mine_num = 8
+class State:
+    gridsize = 8
+    windowsize = 600
+    mine_num = 8
 
-win = None
-playing = True
-grid = []
-size = windowsize / gridsize
+    win = None
+    playing = True
+    grid = []
+    size = windowsize / gridsize
 
 def run():
     main()
 
-    while playing:
+    while State.playing:
         get_input()
 
     print("Thank you for playing Minesweeper!")
+
+if __name__ == '__main__':
+    run()

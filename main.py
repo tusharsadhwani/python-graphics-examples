@@ -4,7 +4,7 @@ from warnings import filterwarnings
 filterwarnings("ignore")
 
 while True:
-    print '''------------------------------------------------
+    print('''------------------------------------------------
 
  ___________________________________
 |                                   |
@@ -17,15 +17,22 @@ while True:
 | 2: Connect Four                   |
 | 3: Exit                           |
 |___________________________________|
-'''
-    a = raw_input("Enter the game no. you want to play:")
-    print '\n------------------------------------------------'
-    if a == '1':
+''')
+    try:
+        a = int(input("Enter the game no. you want to play:"))
+    except Exception:
+        print('Invalid choice.')
+        continue
+
+    print('\n------------------------------------------------')
+    if a == 1:
         mines.run()
-    elif a == '2':
+        continue
+    elif a == 2:
         connect_four.run()
-    elif a == '3':
-        print 'Goodbye!'
+        continue
+    elif a == 3:
+        print('Goodbye!')
         exit()
-    else:
-        print 'Invalid choice.'
+
+    print('Invalid choice.')
